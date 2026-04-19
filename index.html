@@ -388,8 +388,200 @@
   .score-bar-label { font-size: 0.65rem; color: var(--muted); margin-bottom: 4px; display: flex; justify-content: space-between; }
   .score-bar-track { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
   .score-bar-fill { height: 100%; border-radius: 2px; transition: width 1s ease; }
-  </style>
-  </head>
-  <body>
-  </body>
-</html>
+ 
+  /* Port list */
+  .port-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .port-item {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 8px;
+    text-align: center;
+    font-size: 0.68rem;
+  }
+  .port-num { color: var(--accent); font-weight: 700; display: block; font-size: 0.8rem; margin-bottom: 2px; }
+  .port-svc { color: var(--muted); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  .port-open { border-color: rgba(168,255,120,0.2); }
+  .port-filtered { border-color: rgba(255,200,0,0.2); }
+ 
+  /* SSL */
+  .ssl-valid { color: var(--accent3); }
+  .ssl-expire-soon { color: #ffc800; }
+  .ssl-expired { color: var(--accent2); }
+ 
+  /* Subdomain list */
+  .sub-list { list-style: none; }
+  .sub-list li {
+    font-size: 0.72rem;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(26,42,58,0.6);
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sub-list li:last-child { border-bottom: none; }
+  .sub-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--muted); flex-shrink: 0; }
+  .sub-active .sub-dot { background: var(--accent3); }
+ 
+  /* Headers */
+  .header-row { font-size: 0.7rem; padding: 6px 0; border-bottom: 1px solid rgba(26,42,58,0.5); }
+  .header-row:last-child { border-bottom: none; }
+  .header-key { color: var(--accent); }
+  .header-sep { color: var(--muted); margin: 0 4px; }
+  .header-val { color: var(--text); word-break: break-all; }
+ 
+  /* Geo */
+  .geo-map {
+    height: 100px;
+    background: #040810;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    color: var(--muted);
+    position: relative;
+    overflow: hidden;
+  }
+  .geo-map svg { opacity: 0.15; position: absolute; }
+  .geo-coords { position: relative; z-index: 1; text-align: center; }
+  .geo-coords span { display: block; color: var(--accent); font-size: 0.9rem; }
+ 
+  /* Empty/error state */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+    font-size: 0.8rem;
+    display: none;
+  }
+ 
+  /* Export bar */
+  #export-bar {
+    display: none;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .export-text { font-size: 0.75rem; color: var(--muted); }
+  .export-btns { display: flex; gap: 10px; }
+  .export-btn {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    padding: 8px 18px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    cursor: pointer;
+    border-radius: 3px;
+    letter-spacing: 0.05em;
+    transition: all 0.15s;
+  }
+  .export-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .export-btn.primary { border-color: var(--accent); color: var(--accent); background: rgba(0,229,255,0.05); }
+  .export-btn.primary:hover { background: rgba(0,229,255,0.12); }
+ 
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+ 
+  /* Responsive */
+  @media (max-width: 600px) {
+    .search-label { font-size: 1.6rem; }
+    .grid { grid-template-columns: 1fr; }
+    header { flex-direction: column; align-items: flex-start; gap: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+ 
+  <header>
+    <div class="logo">RE<span>CON</span></div>
+    <div class="status-dot"><div class="dot"></div> PASSIVE INTEL ENGINE v1.0</div>
+  </header>
+ 
+  <section class="search-section">
+    <div class="search-label">Intelligence<br><span class="dim">Reconnaissance</span></div>
+    <div class="search-sub">// OSINT dashboard — domain &amp; IP analysis</div>
+ 
+    <div class="search-box">
+      <div class="search-prefix">TARGET://</div>
+      <input type="text" id="targetInput" placeholder="example.com or 93.184.216.34" autocomplete="off" spellcheck="false">
+      <button class="scan-btn" id="scanBtn" onclick="startScan()">SCAN</button>
+    </div>
+ 
+    <div class="tabs">
+      <button class="tab active" onclick="setMode(this,'full')">Full Scan</button>
+      <button class="tab" onclick="setMode(this,'dns')">DNS Only</button>
+      <button class="tab" onclick="setMode(this,'ssl')">SSL/Certs</button>
+      <button class="tab" onclick="setMode(this,'headers')">Headers</button>
+      <button class="tab" onclick="setMode(this,'geo')">GeoIP</button>
+    </div>
+  </section>
+ 
+  <div id="terminal"></div>
+  <div id="results"></div>
+  <div id="export-bar">
+    <div class="export-text">// scan complete — export or share report</div>
+    <div class="export-btns">
+      <button class="export-btn" onclick="copyJSON()">COPY JSON</button>
+      <button class="export-btn primary" onclick="exportHTML()">EXPORT HTML</button>
+    </div>
+  </div>
+</div>
+ 
+<script>
+let scanMode = 'full';
+let currentData = null;
+ 
+function setMode(el, mode) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  scanMode = mode;
+}
+ 
+function log(msg, type='') {
+  const term = document.getElementById('terminal');
+  term.style.display = 'block';
+  const line = document.createElement('div');
+  line.className = `log-line ${type}`;
+  line.style.animationDelay = '0ms';
+  const ts = new Date().toISOString().substr(11,8);
+  line.innerHTML = `<span style="color:var(--muted)">[${ts}]</span> ${msg}`;
+  term.appendChild(line);
+  term.scrollTop = term.scrollHeight;
+}
+ 
+function clearLog() {
+  const term = document.getElementById('terminal');
+  term.innerHTML = '';
+  term.style.display = 'none';
+}
+ 
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+ 
+async function startScan() {
+  const target = document.getElementById('targetInput').value.trim();
+  if (!target) {
+    document.getElementById('targetInput').focus();
+    return;
+  }
+ 
+  clearLog();
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('export-bar').style.display = 'none';
+ 
+  const btn = document.getElementById('scanBtn');
+  btn.disabled = true;
+  btn.textContent = 'SCANNING...';
+ 
+  log(`Initializing scan for <span class="info">${target}</span>`);
+  await sleep(300);
